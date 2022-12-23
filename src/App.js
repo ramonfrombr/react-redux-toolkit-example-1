@@ -5,7 +5,7 @@ import AddPostForm from "./features/posts/AddPostForm";
 
 function App() {
   return (
-    <div className="App">
+    <div className="bg-gray-700 text-white p-5 min-h-screen">
       <AddPostForm />
       <PostsList />
     </div>
