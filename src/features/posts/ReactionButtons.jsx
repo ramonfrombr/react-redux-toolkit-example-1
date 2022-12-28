@@ -16,7 +16,7 @@ const ReactionButtons = ({ post }) => {
   const reactionButtons = Object.entries(reactionEmoji).map(([name, emoji]) => {
     return (
       <button
-        className="rounded border bg-gray-300 text-black mr-1"
+        className="rounded border bg-gray-300 text-black mr-1 px-1"
         key={name}
         type="button"
         onClick={() =>

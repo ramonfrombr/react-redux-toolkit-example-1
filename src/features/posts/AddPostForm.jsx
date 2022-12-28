@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addNewPost } from "./postsSlice";
 import { selectAllUsers } from "../users/usersSlice";
+import { useNavigate } from "react-router-dom";
 
 const AddPostForm = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [userId, setUserId] = useState("");
@@ -28,6 +30,7 @@ const AddPostForm = () => {
         setTitle("");
         setContent("");
         setUserId("");
+        navigate("/");
       } catch (error) {
         console.error("Failed to save post: ", error);
       } finally {
@@ -44,7 +47,7 @@ const AddPostForm = () => {
 
   return (
     <section>
-      <h2 className="text-2xl mb-3">Add a New Post</h2>
+      <h2 className="text-2xl mb-3 text-white">Add a New Post</h2>
 
       <form className="flex flex-col p-5 text-black bg-gray-300 [&>input]:border [&>textarea]:border">
         <label htmlFor="postTitle">Post Title:</label>
