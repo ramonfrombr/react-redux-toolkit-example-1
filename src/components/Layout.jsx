@@ -7,15 +7,12 @@ import { NotificationContext } from "../NotificationContext";
 const Layout = () => {
   const notificationsContext = useContext(NotificationContext);
 
-  useEffect(() => {
-    notificationsContext.toggleNotification({
-      notifications: [["warning", "This is a warning notification"]],
-    });
-  });
-
   return (
     <>
       <Header />
+      <button onClick={() => notificationsContext.toggleNotification()}>
+        Toggle Context
+      </button>
       <main className="p-5 bg-gray-800 min-h-screen">
         <div className="sm:w-2/3 m-auto">
           {notificationsContext.notifications.map((notification, idx) => (
