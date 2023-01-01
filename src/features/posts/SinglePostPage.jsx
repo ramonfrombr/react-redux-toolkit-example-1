@@ -18,7 +18,7 @@ const SinglePostPage = () => {
     );
   }
 
-  return <PostsExcerpt post={post} singlePost />;
+  return <PostsExcerpt postId={postId} singlePost />;
 };
 
 export default SinglePostPage;
