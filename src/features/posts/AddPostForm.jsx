@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { addNewPost } from "./postsSlice";
+import { useSelector } from "react-redux";
 import { selectAllUsers } from "../users/usersSlice";
 import { useNavigate } from "react-router-dom";
+import { useAddNewPostMutation } from "./postsSlice";
 
 const AddPostForm = () => {
-  const dispatch = useDispatch();
+  const [addNewPost, { isLoading }] = useAddNewPostMutation();
+
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [userId, setUserId] = useState("");
-  const [addRequestStatus, setAddRequestStatus] = useState("idle");
 
   const users = useSelector(selectAllUsers);
 
@@ -18,14 +18,12 @@ const AddPostForm = () => {
   const onContentChanged = (e) => setContent(e.target.value);
   const onAuthorChanged = (e) => setUserId(e.target.value);
 
-  const canSave =
-    [title, userId, content].every(Boolean) && addRequestStatus === "idle";
+  const canSave = [title, userId, content].every(Boolean) && !isLoading;
 
-  const onSavePostClicked = () => {
+  const onSavePostClicked = async () => {
     if (canSave) {
       try {
-        setAddRequestStatus("pending");
-        dispatch(addNewPost({ title, body: content, userId })).unwrap();
+        await addNewPost({ title, body: content, userId }).unwrap();
 
         setTitle("");
         setContent("");
@@ -33,8 +31,6 @@ const AddPostForm = () => {
         navigate("/");
       } catch (error) {
         console.error("Failed to save post: ", error);
-      } finally {
-        setAddRequestStatus("idle");
       }
     }
   };
@@ -47,9 +43,9 @@ const AddPostForm = () => {
 
   return (
     <section>
-      <h2 className="text-2xl mb-3 text-white">Add a New Post</h2>
+      <h2 className="mb-3 text-2xl text-white">Add a New Post</h2>
 
-      <form className="flex flex-col p-5 text-black bg-gray-300 [&>input]:border [&>textarea]:border">
+      <form className="flex flex-col bg-gray-300 p-5 text-black [&>input]:border [&>textarea]:border">
         <label htmlFor="postTitle">Post Title:</label>
         <input
           type="text"
@@ -81,7 +77,7 @@ const AddPostForm = () => {
           onClick={onSavePostClicked}
           disabled={!canSave}
           type="button"
-          className="bg-gray-900 text-white p-1 w-fit mt-3"
+          className="mt-3 w-fit bg-gray-900 p-1 text-white"
         >
           Save Post
         </button>

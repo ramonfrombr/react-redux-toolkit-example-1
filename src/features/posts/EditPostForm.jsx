@@ -4,9 +4,14 @@ import { selectPostById, updatePost, deletePost } from "./postsSlice";
 import { useParams, useNavigate } from "react-router-dom";
 import { selectAllUsers } from "../users/usersSlice";
 
+import { useUpdatePostMutation, useDeletePostMutation } from "./postsSlice";
+
 const EditPostForm = () => {
   const { postId } = useParams();
   const navigate = useNavigate();
+
+  const [updatePost, { isLoading }] = useUpdatePostMutation();
+  const [deletePost] = useDeletePostMutation();
 
   const post = useSelector((state) => selectPostById(state, Number(postId)));
   const users = useSelector(selectAllUsers);
@@ -14,9 +19,6 @@ const EditPostForm = () => {
   const [title, setTitle] = useState(post?.title);
   const [content, setContent] = useState(post?.body);
   const [userId, setUserId] = useState(post?.userId);
-  const [requestStatus, setRequestStatus] = useState("idle");
-
-  const dispatch = useDispatch();
 
   if (!post) {
     return (
@@ -30,22 +32,17 @@ const EditPostForm = () => {
   const onContentChanged = (e) => setContent(e.target.value);
   const onAuthorChanged = (e) => setUserId(Number(e.target.value));
 
-  const canSave =
-    [title, content, userId].every(Boolean) && requestStatus === "idle";
+  const canSave = [title, content, userId].every(Boolean) && !isLoading;
 
-  const onSavePostClicked = () => {
+  const onSavePostClicked = async () => {
     if (canSave) {
       try {
-        setRequestStatus("pending");
-        dispatch(
-          updatePost({
-            id: post.id,
-            title,
-            body: content,
-            userId,
-            reactions: post.reactions,
-          })
-        ).unwrap();
+        await updatePost({
+          id: post.id,
+          title,
+          body: content,
+          userId,
+        }).unwrap();
 
         setTitle("");
         setContent("");
@@ -53,8 +50,6 @@ const EditPostForm = () => {
         navigate(`/post/${postId}`);
       } catch (error) {
         console.error("Failed to save the post: ", error);
-      } finally {
-        setRequestStatus("idle");
       }
     }
   };
@@ -65,10 +60,9 @@ const EditPostForm = () => {
     </option>
   ));
 
-  const onDeletePostClicked = () => {
+  const onDeletePostClicked = async () => {
     try {
-      setRequestStatus("pending");
-      dispatch(deletePost({ id: post.id })).unwrap();
+      await deletePost({ id: post.id }).unwrap();
 
       setTitle("");
       setContent("");
@@ -76,15 +70,13 @@ const EditPostForm = () => {
       navigate("/");
     } catch (error) {
       console.error("Failed to delete the post: ", error);
-    } finally {
-      setRequestStatus("idle");
     }
   };
 
   return (
     <section>
-      <h2 className="text-2xl mb-3 text-white">Edit Post</h2>
-      <form className="flex flex-col p-5 text-black bg-gray-300 [&>input]:border [&>textarea]:border">
+      <h2 className="mb-3 text-2xl text-white">Edit Post</h2>
+      <form className="flex flex-col bg-gray-300 p-5 text-black [&>input]:border [&>textarea]:border">
         <label htmlFor="postTitle">Post Title:</label>
         <input
           type="text"
@@ -114,7 +106,7 @@ const EditPostForm = () => {
         />
 
         <button
-          className="bg-gray-900 text-white p-1 w-fit mt-3"
+          className="mt-3 w-fit bg-gray-900 p-1 text-white"
           disabled={!canSave}
           onClick={onSavePostClicked}
           type="button"
@@ -123,7 +115,7 @@ const EditPostForm = () => {
         </button>
 
         <button
-          className="bg-red-500 text-white p-1 w-fit mt-3"
+          className="mt-3 w-fit bg-red-500 p-1 text-white"
           type="button"
           onClick={onDeletePostClicked}
         >
