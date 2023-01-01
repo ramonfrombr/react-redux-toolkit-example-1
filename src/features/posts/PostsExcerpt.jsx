@@ -4,13 +4,16 @@ import TimeAgo from "./TimeAgo";
 import ReactionButtons from "./ReactionButtons";
 
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { selectPostById } from "./postsSlice";
 
 const POST_MAX_CHARACTERS = 75;
 
-const PostsExcerpt = ({ post, singlePost }) => {
+const PostsExcerpt = ({ postId, singlePost }) => {
+  const post = useSelector((state) => selectPostById(state, Number(postId)));
   return (
-    <article className="text-black bg-white rounded p-2 mb-2">
-      <h3 className="text-xl mb-2">{post.title}</h3>
+    <article className="mb-2 rounded bg-white p-2 text-black">
+      <h3 className="mb-2 text-xl">{post.title}</h3>
       <p className="mb-2">
         {singlePost
           ? post.body
